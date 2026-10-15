@@ -1,3 +1,5 @@
+from dbm import error
+
 import numpy as np
 import torch
 
@@ -218,6 +220,17 @@ class LeggedRobot(BaseTask):
         candidate[:, :2].masked_fill_(small_commands.unsqueeze(1), 0.0)
         masked_update(self.commands, candidate, command_mask)
 
+        if hasattr(self, "target_base_height"):
+            height_candidates = torch.empty_like(
+                self.target_base_height
+            ).uniform_(0.20, 0.40)
+
+            masked_update(
+                self.target_base_height,
+                height_candidates,
+                command_mask,
+            )
+
     def _set_camera(self, position, lookat):
         """Set camera position and direction"""
         self._backend.set_camera(position, lookat)
@@ -432,6 +445,12 @@ class LeggedRobot(BaseTask):
         self.commands = torch.zeros(
             self.num_envs, 3, dtype=torch.float, device=self.device
         )
+        self.target_base_height = torch.full(
+            (self.num_envs, 1),
+            0.30,
+            dtype=torch.float,
+            device=self.device,
+        )
         self.base_lin_vel = quat_rotate_inverse(
             self.base_quat, self.root_states[:, 7:10]
         )
@@ -561,9 +580,12 @@ class LeggedRobot(BaseTask):
         return -torch.mean(torch.square(self.projected_gravity[:, :2]), dim=1)
 
     def _reward_base_height(self):
-        """Penalize base height away from target"""
-        target = self.cfg.reward_settings.base_height_target
-        return -torch.square(self.root_states[:, 2] - target)
+        """Reward the robot for tracking commanded base height."""
+        target = self.target_base_height[:, 0]
+        actual = self.base_height[:, 0]
+
+        error = actual - target
+        return torch.exp(-torch.square(error) / 0.01)
 
     def _reward_torques(self):
         """Penalize torques"""

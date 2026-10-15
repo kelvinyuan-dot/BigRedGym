@@ -8,6 +8,7 @@ Usage:
 
 Supports MuJoCo CPU/Warp and optional VSim checkpoints.
 """
+import csv
 
 import argparse
 import random
@@ -130,16 +131,41 @@ def setup(args):
     return env, runner
 
 
+
 def play(env, runner):
     n_steps = 10 * int(env.max_episode_length)
-    for _ in range(n_steps):
-        runner.set_actions(
-            runner.actor_cfg["actions"],
-            runner.get_inference_actions(),
-            runner.actor_cfg["disable_actions"],
-        )
-        env.step()
-        env.check_exit()
+    height_data = []
+
+    try:
+        for step in range(n_steps):
+            runner.set_actions(
+                runner.actor_cfg["actions"],
+                runner.get_inference_actions(),
+                runner.actor_cfg["disable_actions"],
+            )
+
+            env.step()
+
+            height_data.append([
+                (step + 1) * env.dt,
+                env.target_base_height[0, 0].item(),
+                env.base_height[0, 0].item(),
+            ])
+
+            env.check_exit()
+
+    finally:
+        with open("height_data.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "time",
+                "target_height",
+                "actual_height",
+            ])
+            writer.writerows(height_data)
+
+        print("Height data saved to height_data.csv")
+
 
 
 if __name__ == "__main__":

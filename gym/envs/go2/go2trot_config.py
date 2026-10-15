@@ -174,6 +174,7 @@ class Go2TrotCfg(LeggedRobotCfg):
         # Canonical RobotLayout order is FL, FR, RL, RR, with
         # hip, thigh, calf inside each leg. Backends map native order to it.
         base_ang_vel = 0.3
+        target_base_height = 0.30
         base_lin_vel = BASE_HEIGHT_REF
         # dof_vel = 4 * [30.1, 30.1, 15.7]
         dof_vel = 4 * [2.0, 2.0, 4.0]
@@ -210,6 +211,7 @@ class Go2TrotRunnerCfg(LeggedRobotRunnerCfg):
             "base_ang_vel",
             "projected_gravity",
             "commands",
+            "target_base_height",
             "dof_pos_obs",
             "dof_vel",
             "dof_pos_target",
@@ -241,6 +243,7 @@ class Go2TrotRunnerCfg(LeggedRobotRunnerCfg):
             "base_ang_vel",
             "projected_gravity",
             "commands",
+            "target_base_height",
             "dof_pos_obs",
             "dof_vel",
             "dof_pos_target",
@@ -251,14 +254,18 @@ class Go2TrotRunnerCfg(LeggedRobotRunnerCfg):
 
         class reward:
             class weights:
-                tracking_lin_vel = 4.0
-                tracking_ang_vel = 2.0
+                collision = 0.5
+                tracking_lin_vel = 1.0
+                tracking_ang_vel = 0.5
                 lin_vel_z = 0.0
                 ang_vel_xy = 0.01
                 orientation = 1.0
                 torques = 5.0e-6
                 dof_vel = 0.0
-                min_base_height = 0.5
+
+                min_base_height = 0.0
+                base_height = 5.0
+
                 action_rate = 0.25
                 action_rate2 = 0.025
                 stand_still = 0.0

@@ -25,6 +25,13 @@ class MujocoKeyboardInterface:
         self.commands.print_help("MuJoCo viewer")
 
     def _on_key(self, keycode: int) -> None:
+        if keycode == 265:
+            self.commands.apply("height_up")
+            return
+        elif keycode == 264:
+            self.commands.apply("height_down")
+            return
+
         action = KEYCODE_TO_ACTION.get(keycode)
         if action is not None:
             self.commands.apply(action)

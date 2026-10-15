@@ -52,6 +52,7 @@ HELP_LINES = (
     "  R             reset envs",
     "  Esc / window  quit",
     "  commands step in 1/5 increments of max",
+    "  Up/Down       increase / decrease target base height",
 )
 
 
@@ -74,6 +75,9 @@ class TeleopCommands:
         self.max_vel_yaw = 2.0
         self.increment_yaw = self.max_vel_yaw * 0.2
 
+        self.min_base_height = 0.20
+        self.max_base_height = 0.40
+        self.increment_height = 0.02
         env.commands[:] = 0.0
         env.commands[:, 0] = 1.0  # seed forward velocity so motion is visible
         if hasattr(env.cfg, "commands"):
@@ -96,6 +100,26 @@ class TeleopCommands:
             c[:, 2] = torch.clamp(c[:, 2] + self.increment_yaw, max=self.max_vel_yaw)
         elif action == "yaw_right":
             c[:, 2] = torch.clamp(c[:, 2] - self.increment_yaw, min=-self.max_vel_yaw)
+
+        elif action == "height_up":
+            self.env.target_base_height[:] = torch.clamp(
+                self.env.target_base_height + self.increment_height,
+                max=self.max_base_height,
+             )
+            print(
+                "Target height:", round(self.env.target_base_height[0, 0].item(), 3),
+                "Actual height:", round(self.env.base_height[0, 0].item(), 3),
+                )
+        elif action == "height_down":
+            self.env.target_base_height[:] = torch.clamp(
+                self.env.target_base_height - self.increment_height,
+                min=self.min_base_height,
+              )
+            print(
+                "Target height:", round(self.env.target_base_height[0, 0].item(), 3),
+                "Actual height:", round(self.env.base_height[0, 0].item(), 3),
+                )
+
         elif action == "reset":
             self.env.timed_out[:] = True
             self.env.reset()
