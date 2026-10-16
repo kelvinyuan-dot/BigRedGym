@@ -106,7 +106,7 @@ class TeleopCommands:
         elif action == "yaw_right":
             c[:, 2] = torch.clamp(c[:, 2] - self.increment_yaw, min=-self.max_vel_yaw)
 
-        elif action == "height_up":
+        elif action in ("height_up", "up"):
             self.env.target_base_height[:] = torch.clamp(
                 self.env.target_base_height + self.increment_height,
                 max=self.max_base_height,
@@ -115,7 +115,7 @@ class TeleopCommands:
                 "Target height:", round(self.env.target_base_height[0, 0].item(), 3),
                 "Actual height:", round(self.env.base_height[0, 0].item(), 3),
                 )
-        elif action == "height_down":
+        elif action in ("height_down", "down"):
             self.env.target_base_height[:] = torch.clamp(
                 self.env.target_base_height - self.increment_height,
                 min=self.min_base_height,

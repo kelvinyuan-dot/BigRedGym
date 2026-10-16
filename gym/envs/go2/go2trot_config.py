@@ -100,7 +100,7 @@ class Go2TrotCfg(Go2Cfg):
         # hip, thigh, calf inside each leg. Backends map native order to it.
         base_ang_vel = 0.3
         target_base_height = 0.30
-        base_lin_vel = BASE_HEIGHT_REF
+    
         dof_vel = 4 * [2.0, 2.0, 4.0]
 
         base_height = 0.3

@@ -30,10 +30,10 @@ class MujocoKeyboardInterface:
 
     def _on_key(self, keycode: int) -> None:
         if keycode == 265:
-            self.commands.apply("height_up")
+            self.commands.apply("up")
             return
         elif keycode == 264:
-            self.commands.apply("height_down")
+            self.commands.apply("down")
             return
 
         action = KEYCODE_TO_ACTION.get(keycode)
