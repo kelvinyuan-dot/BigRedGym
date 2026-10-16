@@ -4,7 +4,7 @@ The vsim backend's engine (`vlearn`) is closed-source and licensed; its
 binaries cannot be committed (100 KB file cap + licensing). The `vlearn/`
 subdirectory holds the machine-local pieces, all gitignored:
 
-- `vlearn-0.3.14+cu130-cp311-cp311-linux_x86_64.whl` — the selected engine wheel
+- `vlearn-0.3.15+cu130-cp311-cp311-linux_x86_64.whl` — the selected engine wheel
   (from the vendor / the vlearn SDK repo). `[tool.uv.sources]` in
   pyproject.toml points here; install with `uv sync --frozen --extra vsim`.
   The CUDA 13.0 variant matches the locked Linux PyTorch build.
@@ -19,6 +19,10 @@ subdirectory holds the machine-local pieces, all gitignored:
 - `shaders/` + `assets/{VsimTile,Skybox}.png` — renderer files, needed only
   for the viewer (copied from the vlearn SDK repo root). Headless runs work
   without them.
+- `assets/go2/assets/*.obj` + `assets/licenses/go2-LICENSE.txt` — Go2 visual
+  meshes from the SDK repository. Go2/Go2Trot VSim conversion requires these
+  instead of the unavailable `package://go2_description/dae/*.dae` resources.
+  Only visuals are substituted; our URDF remains the physical model.
 
 ## Install and activate
 
